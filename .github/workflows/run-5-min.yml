@@ -1,0 +1,43 @@
+# The "ON" button: GitHub -> Actions -> "Run 5 minutes" -> Run workflow.
+# Runs on GitHub's servers (not your PC, not Claude). Writes the India time to
+# log.txt once a minute for 5 minutes and pushes each line, so the page shows it.
+name: Run 5 minutes
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: run-5-min
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write the time every minute for 5 minutes and push it
+        env:
+          RUN_NO: ${{ github.run_number }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          add() {
+            echo "$(TZ=Asia/Kolkata date '+%Y-%m-%d|%H:%M:%S')|$RUN_NO|$1" >> log.txt
+            git add log.txt
+            git commit -q -m "Run $RUN_NO: $1"
+            for try in 1 2 3; do
+              if git pull -q --rebase origin main && git push -q origin HEAD:main; then return 0; fi
+              sleep 5
+            done
+            echo "Push failed: $1"
+            return 1
+          }
+          add "Run started (ON pressed)"
+          for m in 1 2 3 4 5; do
+            sleep 60
+            if [ "$m" -lt 5 ]; then add "Running: minute $m of 5"; else add "Run finished (5 minutes)"; fi
+          done

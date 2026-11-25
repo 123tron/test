@@ -3,83 +3,151 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cloud Push Test</title>
+<title>Cloud Run Test</title>
 <style>
   :root {
     --bg: #f3f5f8; --surface: #fff; --ink: #18202c; --muted: #5b6676; --line: #dde3eb;
-    --accent: #1f5fbf; --ok: #157347; --mark: #fff4d6;
+    --accent: #1f5fbf; --accent-ink: #fff; --run: #1f5fbf; --run-bg: #e6eefb;
+    --ok: #157347; --ok-bg: #e3f4ea; --warn: #9a6100; --warn-bg: #fff4e0; --mark: #fff4d6;
     --mono: ui-monospace, "SF Mono", Consolas, monospace;
   }
   @media (prefers-color-scheme: dark) {
     :root { --bg: #11151b; --surface: #1a2029; --ink: #e6ebf2; --muted: #9aa6b6; --line: #2c3542;
-      --accent: #8db4f5; --ok: #6fd39d; --mark: #3a3016; color-scheme: dark; }
+      --accent: #8db4f5; --accent-ink: #0d1420; --run: #8db4f5; --run-bg: #1d2b44;
+      --ok: #6fd39d; --ok-bg: #17331f; --warn: #f0c36a; --warn-bg: #3a2e12; --mark: #3a3016; color-scheme: dark; }
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  .wrap { max-width: 640px; margin: 0 auto; padding: 28px 16px 40px; display: grid; gap: 16px; }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 28px 16px 40px; display: grid; gap: 16px; }
   h1 { margin: 0; font-size: 22px; }
   .sub { margin: 4px 0 0; color: var(--muted); }
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
   h2 { margin: 0 0 10px; font-size: 15px; }
-  ol { list-style: none; margin: 0; padding: 0; font: 14px var(--mono); }
-  ol li { padding: 6px 8px; border-bottom: 1px solid var(--line); border-radius: 6px; }
-  ol li:last-child { border-bottom: 0; }
-  ol li.after { background: var(--mark); }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .pill { font-weight: 650; font-size: 13px; padding: 4px 12px; border-radius: 999px; background: var(--line); color: var(--muted); }
+  .pill.run { background: var(--run-bg); color: var(--run); }
+  .pill.ok { background: var(--ok-bg); color: var(--ok); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn); }
+  a.on { display: inline-block; background: var(--accent); color: var(--accent-ink); text-decoration: none; font-weight: 700; font-size: 17px; padding: 12px 26px; border-radius: 10px; }
+  a.on:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button { font: inherit; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+  .steps { margin: 12px 0 0; padding-left: 20px; color: var(--muted); font-size: 14px; }
+  .muted { color: var(--muted); font-size: 14px; }
+  .err { color: var(--warn); font-size: 14px; }
+  ol.log { list-style: none; margin: 0; padding: 0; font: 14px var(--mono); }
+  ol.log li { display: flex; gap: 12px; padding: 6px 8px; border-bottom: 1px solid var(--line); border-radius: 6px; }
+  ol.log li:last-child { border-bottom: 0; }
+  ol.log li.after { background: var(--mark); }
+  ol.log .t { min-width: 72px; }
+  .run + .run { margin-top: 16px; }
+  .run h3 { margin: 0 0 6px; font-size: 14px; }
   label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
   input { font: 15px var(--mono); padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); width: 9em; }
   .verdict { margin: 10px 0 0; font-weight: 600; color: var(--ok); }
-  .muted { color: var(--muted); font-size: 14px; }
-  b.clock { font-family: var(--mono); }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>Cloud Push Test</h1>
-    <p class="sub">Each line below was written and pushed to GitHub by Claude from the cloud. GitHub Pages hosts this page.</p>
+    <h1>Cloud Run Test</h1>
+    <p class="sub">Press ON and GitHub's servers run for 5 minutes, writing the time every minute. Your PC can be off.</p>
   </header>
 
   <section class="card">
-    <p class="muted" style="margin:0">Your time now: <b class="clock" id="now"></b></p>
-  </section>
-
-  <section class="card">
-    <h2>Updates pushed from the cloud (India time)</h2>
-    <!-- UPDATES: Claude adds one <li> per push below this line -->
-    <ol id="log">
-      <li data-t="15:14:33">15:14:33  Page created and first push</li>
-      <li data-t="15:19:58">15:19:58  Update 1/6 pushed from the cloud</li>
-      <li data-t="15:23:00">15:23:00  Update 2/6 pushed from the cloud</li>
-      <li data-t="15:26:03">15:26:03  Update 3/6 pushed from the cloud</li>
-      <li data-t="15:29:04">15:29:04  Update 4/6 pushed from the cloud</li>
-      <li data-t="15:32:07">15:32:07  Update 5/6 pushed from the cloud</li>
-      <li data-t="15:35:09">15:35:09  Update 6/6 pushed from the cloud</li>
+    <div class="row"><span class="pill" id="pill">Loading…</span><span id="statusText" class="muted"></span></div>
+    <div style="margin-top:14px">
+      <a class="on" href="https://github.com/123tron/test/actions/workflows/run-5-min.yml" target="_blank" rel="noopener">▶ ON — start a 5-minute run</a>
+    </div>
+    <ol class="steps">
+      <li>ON opens GitHub (log in if asked).</li>
+      <li>Press <b>Run workflow</b> on the right, then the green <b>Run workflow</b>.</li>
+      <li>Turn your PC off if you like. Come back after 6 minutes and open this page.</li>
     </ol>
   </section>
 
   <section class="card">
     <label for="offAt">When did you turn your PC off? (HH:MM)</label>
-    <input id="offAt" placeholder="15:20" inputmode="numeric" autocomplete="off">
+    <input id="offAt" placeholder="15:52" inputmode="numeric" autocomplete="off">
     <p class="verdict" id="verdict"></p>
-    <p class="muted">Updates after that time are highlighted: they were pushed while your PC was off.</p>
+    <p class="muted">Lines of the latest run after that time are highlighted: they were written while your PC was off.</p>
+  </section>
+
+  <section class="card">
+    <div class="row" style="justify-content:space-between"><h2 style="margin:0">Runs (India time, newest first)</h2>
+      <div class="row"><span class="muted" id="checked"></span><button id="refresh">Refresh</button></div></div>
+    <p class="err" id="err"></p>
+    <div id="runs" style="margin-top:6px"></div>
   </section>
 </div>
 <script>
+"use strict";
+const LOG_URL = "https://api.github.com/repos/123tron/test/contents/log.txt?ref=main";
+const $ = (id) => document.getElementById(id);
 const toSec = (t) => { const m = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(String(t).trim()); return m ? m[1] * 3600 + m[2] * 60 + (+(m[3] || 0)) : null; };
-function render() {
-  const off = toSec(document.getElementById("offAt").value);
-  let n = 0;
-  for (const li of document.querySelectorAll("#log li")) {
-    const after = off !== null && toSec(li.dataset.t) > off;
-    li.classList.toggle("after", after);
-    if (after) n++;
+let runs = [];
+
+function parse(text) {
+  const byRun = new Map();
+  for (const line of text.split("\n")) {
+    const [date, time, run, ...rest] = line.split("|");
+    if (!date || !time || !run) continue;
+    if (!byRun.has(run)) byRun.set(run, { run, date, lines: [] });
+    byRun.get(run).lines.push({ time, msg: rest.join("|"), at: new Date(`${date}T${time}+05:30`) });
   }
-  document.getElementById("verdict").textContent =
-    off === null ? "" : n ? `${n} update${n > 1 ? "s" : ""} pushed after your PC was off.` : "No updates after that time yet.";
+  return [...byRun.values()].sort((a, b) => Number(b.run) - Number(a.run));
 }
-document.getElementById("offAt").addEventListener("input", render);
-setInterval(() => { document.getElementById("now").textContent = new Date().toLocaleTimeString("en-GB", { timeZone: "Asia/Kolkata" }); }, 1000);
-render();
+
+function render() {
+  const latest = runs[0];
+  const pill = $("pill");
+  if (!latest) { pill.className = "pill"; pill.textContent = "No runs yet"; $("statusText").textContent = "Press ON to start the first run."; }
+  else {
+    const last = latest.lines[latest.lines.length - 1];
+    const done = /finished/i.test(last.msg);
+    const fresh = Date.now() - last.at.getTime() < 3 * 60000;
+    pill.className = "pill " + (done ? "ok" : fresh ? "run" : "warn");
+    pill.textContent = done ? "Finished" : fresh ? "Running" : "Stopped";
+    $("statusText").textContent = `Run #${latest.run} started ${latest.lines[0].time} on ${latest.date}`;
+  }
+  const off = toSec($("offAt").value);
+  const box = $("runs");
+  box.innerHTML = "";
+  let after = 0;
+  runs.forEach((r, i) => {
+    const div = document.createElement("div"); div.className = "run";
+    const h = document.createElement("h3"); h.textContent = `Run #${r.run} — ${r.date}`;
+    const ol = document.createElement("ol"); ol.className = "log";
+    for (const l of r.lines) {
+      const li = document.createElement("li");
+      if (i === 0 && off !== null && toSec(l.time) > off) { li.className = "after"; after++; }
+      const t = document.createElement("span"); t.className = "t"; t.textContent = l.time;
+      const m = document.createElement("span"); m.textContent = l.msg;
+      li.append(t, m); ol.append(li);
+    }
+    div.append(h, ol); box.append(div);
+  });
+  if (!runs.length) box.innerHTML = '<p class="muted">Nothing yet. Each run adds six lines here: the start, minutes 1 to 4, and the finish.</p>';
+  $("verdict").textContent = off === null || !latest ? "" : after ? `${after} line${after > 1 ? "s" : ""} of run #${latest.run} written after your PC was off.` : "No lines of the latest run after that time.";
+}
+
+async function load() {
+  $("err").textContent = "";
+  try {
+    const res = await fetch(LOG_URL, { headers: { Accept: "application/vnd.github.raw+json" }, cache: "no-store" });
+    if (res.status === 403 || res.status === 429) throw new Error("GitHub's limit for this network was reached. Try again in a few minutes.");
+    if (!res.ok) throw new Error(`Could not read the log (HTTP ${res.status}).`);
+    runs = parse(await res.text());
+    $("checked").textContent = "Checked " + new Date().toLocaleTimeString("en-GB", { timeZone: "Asia/Kolkata" });
+  } catch (e) { $("err").textContent = e.message; }
+  render();
+}
+
+$("offAt").addEventListener("input", () => { try { localStorage.setItem("offAt", $("offAt").value); } catch {} render(); });
+try { $("offAt").value = localStorage.getItem("offAt") || ""; } catch {}
+$("refresh").addEventListener("click", load);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
+setInterval(() => { if (!document.hidden) load(); }, 90000);
+load();
 </script>
 </body>
 </html>
