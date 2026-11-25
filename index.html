@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cloud Push Test</title>
+<style>
+  :root {
+    --bg: #f3f5f8; --surface: #fff; --ink: #18202c; --muted: #5b6676; --line: #dde3eb;
+    --accent: #1f5fbf; --ok: #157347; --mark: #fff4d6;
+    --mono: ui-monospace, "SF Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #11151b; --surface: #1a2029; --ink: #e6ebf2; --muted: #9aa6b6; --line: #2c3542;
+      --accent: #8db4f5; --ok: #6fd39d; --mark: #3a3016; color-scheme: dark; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 28px 16px 40px; display: grid; gap: 16px; }
+  h1 { margin: 0; font-size: 22px; }
+  .sub { margin: 4px 0 0; color: var(--muted); }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  h2 { margin: 0 0 10px; font-size: 15px; }
+  ol { list-style: none; margin: 0; padding: 0; font: 14px var(--mono); }
+  ol li { padding: 6px 8px; border-bottom: 1px solid var(--line); border-radius: 6px; }
+  ol li:last-child { border-bottom: 0; }
+  ol li.after { background: var(--mark); }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  input { font: 15px var(--mono); padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); width: 9em; }
+  .verdict { margin: 10px 0 0; font-weight: 600; color: var(--ok); }
+  .muted { color: var(--muted); font-size: 14px; }
+  b.clock { font-family: var(--mono); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Cloud Push Test</h1>
+    <p class="sub">Each line below was written and pushed to GitHub by Claude from the cloud. GitHub Pages hosts this page.</p>
+  </header>
+
+  <section class="card">
+    <p class="muted" style="margin:0">Your time now: <b class="clock" id="now"></b></p>
+  </section>
+
+  <section class="card">
+    <h2>Updates pushed from the cloud (India time)</h2>
+    <!-- UPDATES: Claude adds one <li> per push below this line -->
+    <ol id="log">
+      <li data-t="15:14:33">15:14:33  Page created and first push</li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <label for="offAt">When did you turn your PC off? (HH:MM)</label>
+    <input id="offAt" placeholder="15:20" inputmode="numeric" autocomplete="off">
+    <p class="verdict" id="verdict"></p>
+    <p class="muted">Updates after that time are highlighted: they were pushed while your PC was off.</p>
+  </section>
+</div>
+<script>
+const toSec = (t) => { const m = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(String(t).trim()); return m ? m[1] * 3600 + m[2] * 60 + (+(m[3] || 0)) : null; };
+function render() {
+  const off = toSec(document.getElementById("offAt").value);
+  let n = 0;
+  for (const li of document.querySelectorAll("#log li")) {
+    const after = off !== null && toSec(li.dataset.t) > off;
+    li.classList.toggle("after", after);
+    if (after) n++;
+  }
+  document.getElementById("verdict").textContent =
+    off === null ? "" : n ? `${n} update${n > 1 ? "s" : ""} pushed after your PC was off.` : "No updates after that time yet.";
+}
+document.getElementById("offAt").addEventListener("input", render);
+setInterval(() => { document.getElementById("now").textContent = new Date().toLocaleTimeString("en-GB", { timeZone: "Asia/Kolkata" }); }, 1000);
+render();
+</script>
+</body>
+</html>
